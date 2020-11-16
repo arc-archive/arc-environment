@@ -194,6 +194,7 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
         title="Add a variable" 
         aria-label="Activate to add a new variable"
         @click="${this[varAddHandler]}"
+        data-action="add-variables"
       >
         <arc-icon icon="addCircleOutline"></arc-icon>
       </anypoint-icon-button>`}
@@ -201,6 +202,7 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
         title="Toggle values visibility" 
         aria-label="Activate to toggle variables visibility"
         @click="${this[visibilityToggleHandler]}"
+        data-action="toggle-visibility"
       >
         <arc-icon icon="${icon}"></arc-icon>
       </anypoint-icon-button>

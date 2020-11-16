@@ -135,7 +135,9 @@ const mxFunction = (base) => {
     }
 
     connectedCallback() {
-      super.connectedCallback();
+      if (super.connectedCallback) {
+        super.connectedCallback();
+      }
       window.addEventListener(ArcModelEventTypes.Environment.State.select, this[environmentSelectHandler]);
       window.addEventListener(ArcModelEventTypes.Environment.State.delete, this[environmentDeleteHandler]);
       window.addEventListener(ArcModelEventTypes.Environment.State.update, this[environmentUpdateHandler]);
@@ -146,7 +148,9 @@ const mxFunction = (base) => {
     }
 
     disconnectedCallback() {
-      super.disconnectedCallback();
+      if (super.disconnectedCallback) {
+        super.disconnectedCallback();
+      }
       window.removeEventListener(ArcModelEventTypes.Environment.State.select, this[environmentSelectHandler]);
       window.removeEventListener(ArcModelEventTypes.Environment.State.delete, this[environmentDeleteHandler]);
       window.removeEventListener(ArcModelEventTypes.Environment.State.update, this[environmentUpdateHandler]);
@@ -269,7 +273,7 @@ const mxFunction = (base) => {
       }
       const { environment } = this;
       if (environment && environment._id === id) {
-        await this.selectEnvironment(null);
+        this.selectEnvironment(null);
       }
     }
 
@@ -330,10 +334,6 @@ const mxFunction = (base) => {
         return;
       }
       const { environment } = this;
-      if (environment === undefined) {
-        // no selection
-        return;
-      }
       if (!environment && item.environment !== 'default') {
         return;
       }

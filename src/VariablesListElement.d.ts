@@ -53,6 +53,8 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
    */
   system: boolean;
 
+  get titleValue(): string;
+
   constructor();
 
   /**
