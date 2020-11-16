@@ -134,13 +134,13 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
    * @param {CustomEvent} e
    */
   [toggleVariableHandler](e) {
-    if (this.system) {
-      return;
-    }
     const node = /** @type HTMLInputElement */ (e.currentTarget);
     const { id } = node.dataset;
     const { checked } = node;
     const variable = this.variables.find((item) => item._id === id);
+    if (variable.enabled === checked) {
+      return;
+    }
     variable.enabled = checked;
     ArcModelEvents.Variable.update(this, variable);
   }
@@ -150,9 +150,6 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
    * @param {Event} e
    */
   [variableInputHandler](e) {
-    if (this.system) {
-      return;
-    }
     const node = /** @type HTMLInputElement */ (e.currentTarget);
     const { id } = node.dataset;
     const { value } = node;
@@ -166,9 +163,6 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
    * @param {PointerEvent} e
    */
   async [deleteVariableHandler](e) {
-    if (this.system) {
-      return;
-    }
     const node = /** @type HTMLElement */ (e.currentTarget);
     const { id } = node.dataset;
     await ArcModelEvents.Variable.delete(this, id);
@@ -265,6 +259,7 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
         title="Edit the variable" 
         aria-label="Activate to edit the variable"
         data-id="${item._id}"
+        data-action="edit"
         @click="${this[editVariableHandler]}"
       >
         <arc-icon icon="edit"></arc-icon>
@@ -274,6 +269,7 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
         title="Delete the variable" 
         aria-label="Activate to remove the variable"
         data-id="${item._id}"
+        data-action="remove"
         @click="${this[deleteVariableHandler]}"
       >
         <arc-icon icon="removeCircleOutline"></arc-icon>
@@ -333,6 +329,7 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
       <anypoint-button 
         ?compatibility="${compatibility}"
         @click="${this[variableEditorCloseHandler]}"
+        data-action="close-editor"
       >Close</anypoint-button>
     </li>
     `;

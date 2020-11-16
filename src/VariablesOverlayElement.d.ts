@@ -13,6 +13,7 @@ export declare const systemVarsToggleHandler: unique symbol;
 
 /**
  * `Renders an overlay with variables information.
+ * @fires ready Dispatched when refreshed the list of environments and the current environment
  */
 export class VariablesOverlayElement extends VariablesConsumerMixin(ArcOverlayMixin(LitElement)) {
   static get styles(): CSSResult;
@@ -36,6 +37,11 @@ export class VariablesOverlayElement extends VariablesConsumerMixin(ArcOverlayMi
   constructor();
   
   connectedCallback(): void;
+
+  /**
+   * Refreshes the current environment and list of available environments
+   */
+  reset(): Promise<void>;
 
   [systemVarsToggleHandler](e: Event): Promise<void>;
 

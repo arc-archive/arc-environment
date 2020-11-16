@@ -53,8 +53,16 @@ export class VariablesOverlayElement extends VariablesConsumerMixin(ArcOverlayMi
   
   connectedCallback() {
     super.connectedCallback();
-    this.refreshEnvironment();
-    this.refreshEnvironments();
+    this.reset();
+  }
+
+  /**
+   * Refreshes the current environment and list of available environments
+   */
+  async reset() {
+    await this.refreshEnvironment();
+    await this.refreshEnvironments();
+    this.dispatchEvent(new CustomEvent('ready'));
   }
 
   /**
@@ -121,6 +129,7 @@ export class VariablesOverlayElement extends VariablesConsumerMixin(ArcOverlayMi
       .renderValues="${this.renderValues}"
       .compatibility="${this.compatibility}"
       .outlined="${this.outlined}"
+      class="environment-variables"
     ></variables-list>`;
   }
 

@@ -7,6 +7,7 @@ import { ArcModelEvents, ArcModelEventTypes } from '@advanced-rest-client/arc-mo
 import { ConfigEventTypes, ConfigEvents } from '@advanced-rest-client/arc-events';
 import { VariablesConsumerMixin } from '../index.js';
 import { systemVariablesModel, systemVariablesValue } from '../src/VariablesConsumerMixin.js';
+import { resetSelection } from './ModelUtils.js';
 
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCVariable} ARCVariable */
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCEnvironment} ARCEnvironment */
@@ -49,6 +50,7 @@ describe('VariablesConsumerMixin', () => {
     let createdDefault = /** @type ARCVariable[] */ (null);
     let createdRandom = /** @type ARCVariable[] */ (null);
     before(async () => {
+      await resetSelection();
       createdDefault = await generator.insertVariablesAndEnvironments({
         defaultEnv: true,
         size: 5,
@@ -60,6 +62,7 @@ describe('VariablesConsumerMixin', () => {
     });
 
     after(async () => {
+      await resetSelection();
       await generator.destroyVariablesData();
     });
     
@@ -121,10 +124,12 @@ describe('VariablesConsumerMixin', () => {
         size: 5,
       });
       envs = await generator.getDatastoreEnvironmentsData();
+      assert.isAbove(envs.length, 0);
     });
 
     after(async () => {
       await generator.destroyVariablesData();
+      await resetSelection();
     });
     
     beforeEach(async () => {

@@ -223,8 +223,8 @@ export class EnvironmentSelectorElement extends VariablesConsumerMixin(LitElemen
       >
         <label slot="label">Environment name</label>
       </anypoint-input>
-      <anypoint-button emphasis="medium" @click="${this[envAddClickHandler]}">Save</anypoint-button>
-      <anypoint-button @click="${this[envAddCancelHandler]}">Cancel</anypoint-button>
+      <anypoint-button data-action="save" emphasis="medium" @click="${this[envAddClickHandler]}">Save</anypoint-button>
+      <anypoint-button data-action="cancel" @click="${this[envAddCancelHandler]}">Cancel</anypoint-button>
     </div>
     `;
   }
