@@ -73,6 +73,7 @@ export class EnvironmentSelectorElement extends VariablesConsumerMixin(LitElemen
    */
   [envSelectorClosed]() {
     this[envSelectorOpened] = false;
+    this.requestUpdate();
   }
 
   /**
