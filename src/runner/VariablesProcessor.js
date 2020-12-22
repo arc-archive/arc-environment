@@ -178,12 +178,22 @@ export class VariablesProcessor {
         if (['{', '}'].includes(item.trim())) {
           items[items.length] = item;
         } else {
-          items[items.length] = await jexl.eval(item, context);
+          try {
+            items[items.length] = await jexl.eval(item, context);
+          } catch (e) {
+            items[items.length] = item;
+          }
         }
       }
       return items.join('\n');
     }
-    return jexl.eval(result, context);
+    let returnValue = value;
+    try {
+      returnValue = await jexl.eval(result, context);
+    } catch (e) {
+      // ...
+    }
+    return returnValue;
   }
 
   /**
@@ -487,6 +497,10 @@ export class VariablesProcessor {
         return this._wrapJsonValue(parsed, isJsonValue);
       }
       let variable = tokenizer.nextUntil('}');
+      if (variable === '') {
+        // let this pass.
+        continue;
+      }
       if (!variable) {
         throw new Error('Syntax error. Unclosed curly bracket.');
       }
