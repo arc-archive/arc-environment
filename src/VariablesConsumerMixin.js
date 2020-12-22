@@ -95,6 +95,7 @@ const mxFunction = (base) => {
         systemVariablesEnabled: { type: Boolean },
         /** 
          * The list of system variables to process. This is a regular key-value map of variables.
+         * It is set from the `variable-model` event, if the model sets this value. Otherwise it is safe to set it in here.
          */
         systemVariables: { type: Object },
       };
@@ -167,13 +168,16 @@ const mxFunction = (base) => {
      */
     async refreshEnvironment() {
       const record = await ArcModelEvents.Environment.current(this);
-      const { environment, variables } = record;
+      const { environment, variables, systemVariables } = record;
       if (environment) {
         this.environment = environment;
       } else {
         this.environment = null;
       }
       this.variables = variables;
+      if (systemVariables) {
+        this.systemVariables = systemVariables;
+      }
       await this.requestUpdate();
     }
 

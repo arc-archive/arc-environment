@@ -79,7 +79,6 @@ class ComponentDemoPage extends DemoPage {
           ?compatibility="${compatibility}"
           ?outlined="${outlined}"
           .systemVariablesEnabled="${withSystemVariables}"
-          .systemVariables="${variables}"
         ></variables-overlay>
       </section>
     `;
@@ -88,7 +87,7 @@ class ComponentDemoPage extends DemoPage {
   contentTemplate() {
     return html`
       <h2>Environment overlay</h2>
-      <variables-model></variables-model>
+      <variables-model .systemVariables="${variables}"></variables-model>
       ${this._demoTemplate()}
     `;
   }

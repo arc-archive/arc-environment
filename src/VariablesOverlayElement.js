@@ -72,6 +72,7 @@ export class VariablesOverlayElement extends VariablesConsumerMixin(ArcOverlayMi
     const input = /** @type HTMLInputElement */ (e.target);
     await this.toggleSystemVariables(input.checked);
     this.notifyResize();
+    this.refit();
   }
 
   [closeHandler]() {
