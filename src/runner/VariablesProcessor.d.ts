@@ -1,6 +1,5 @@
 import { ARCVariable } from '@advanced-rest-client/arc-models';
-import Jexl from 'jexl';
-import { Overrides, VariablesMap } from '../types';
+import { EvaluateOptions, VariablesMap } from '../types';
 
 /**
  * function that tests whether a passed variable contains a variable.
@@ -13,13 +12,13 @@ export declare const functionRegex: RegExp;
 export declare const varValueRe: RegExp;
 
 export declare class VariablesProcessor {
-  jexl: Jexl.Jexl;
+  jexl: any;
   variables: ARCVariable[];
   /**
    * @param jexl A reference to the the Jexl instance.
    * @param variables List of application variables
    */
-  constructor(jexl: Jexl.Jexl, variables: ARCVariable[]);
+  constructor(jexl: any, variables: ARCVariable[]);
 
   /**
    * Requests for a variables list from the variables manager
@@ -27,13 +26,10 @@ export declare class VariablesProcessor {
    *
    * If the `variables-manager` is not present it returns empty object.
    *
-   * @param override Map of key - value pars to override variables
-   * or to add temporary variables to the context. Values for keys that
-   * exists in variables array (the `variable` property) will update value of
-   * the variable. Rest is added to the list.
+   * @param override Optional map of variables to use to override the built context.
    * @returns Promise resolved to the context to be passed to Jexl.
    */
-  buildContext(override?: Overrides): Promise<VariablesMap>;
+  buildContext(override?: VariablesMap): Promise<VariablesMap>;
 
   /**
    * Overrides variables with passed values.
@@ -41,7 +37,7 @@ export declare class VariablesProcessor {
    * @param override Values to override the variables with
    * @returns A copy the `variables` object
    */
-  overrideContext(variables: ARCVariable[], override: Overrides): ARCVariable[];
+  overrideContext(variables: ARCVariable[], override: VariablesMap): ARCVariable[];
 
   /**
    * Clears cached groups.
@@ -52,19 +48,19 @@ export declare class VariablesProcessor {
    * Evaluates a value against the variables in the current environment
    *
    * @param value A value to evaluate
-   * @param override A list of variables to override in created context.
+   * @param options Execution options
    * @returns Promise that resolves to the evaluated value.
    */
-  evaluateVariable(value: string, override?: Overrides, context?: VariablesMap): Promise<string>;
+  evaluateVariable(value: string, options?: EvaluateOptions): Promise<string>;
 
   /**
    * Recursively evaluate variables on an object.
    *
    * @param obj The map containing variables
-   * @param props Optional, list of properties to evaluate. If not set then it scans for all keys in the object.
+   * @param options Execution options
    * @returns Promise resolved to evaluated object.
    */
-  evaluateVariables(obj: VariablesMap, props?: string[]): Promise<VariablesMap>;
+  evaluateVariables<T>(obj: T, options?: EvaluateOptions): Promise<T>;
 
   /**
    * Evaluates a value with context passed to Jexl.
@@ -111,7 +107,7 @@ export declare class VariablesProcessor {
    * @param args Arguments find in the expression.
    * @returns Result of calling a function. Always a string.
    */
-  _callFn(fnName: string, args: string[]): string|number;
+  _callFn(fnName: string, args?: (string|number)[]): string|number;
 
   /**
    * Calls JavaScript native function.
@@ -122,7 +118,7 @@ export declare class VariablesProcessor {
    * @param args A list of arguments to call
    * @returns Processed value.
    */
-  _callNamespaceFunction(namespace: string, fn: string, args?: string[]): string|number;
+  _callNamespaceFunction(namespace: string, fn: string, args?: (string|number|object)[]): string|number;
 
   /**
    * Calls the `now()` function. Returns current timestamp.

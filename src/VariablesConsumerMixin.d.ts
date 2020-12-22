@@ -1,4 +1,5 @@
 import { ConfigStateUpdateEvent } from '@advanced-rest-client/arc-events';
+import { Variable } from '@advanced-rest-client/arc-types';
 import { ARCEnvironment, ARCEnvironmentDeletedEvent, ARCEnvironmentStateSelectEvent, ARCEnvironmentUpdatedEvent, ARCModelStateDeleteEvent, ARCVariable, ARCVariableDeletedEvent, ARCVariableUpdatedEvent } from '@advanced-rest-client/arc-models';
 
 export declare const environmentValue: unique symbol;
@@ -14,7 +15,6 @@ export declare const processSystemVariables: unique symbol;
 export declare const configChangeHandler: unique symbol;
 
 export declare const defaultEnvironmentLabel: string;
-export declare type SystemVariables = Readonly<{[key: string]: string}>;
 
 
 declare function VariablesConsumerMixin<T extends new (...args: any[]) => {}>(base: T): T & VariablesConsumerMixinConstructor;
@@ -56,8 +56,8 @@ export interface VariablesConsumerMixin {
   /** 
    * The list of system variables to process. This is a regular key-value map of variables.
    */
-  systemVariables: SystemVariables;
-  [systemVariablesValue]: SystemVariables;
+  systemVariables: Variable.SystemVariables;
+  [systemVariablesValue]: Variable.SystemVariables;
   [systemVariablesModel]: ARCVariable[];
 
   connectedCallback(): void;
@@ -103,7 +103,7 @@ export interface VariablesConsumerMixin {
    * @param vars THe variables to process
    * @returns Processed variables model
    */
-  [processSystemVariables](vars: SystemVariables): ARCVariable[];
+  [processSystemVariables](vars: Variable.SystemVariables): ARCVariable[];
 
   [environmentDeleteHandler](e: ARCEnvironmentDeletedEvent): Promise<void>;
 
