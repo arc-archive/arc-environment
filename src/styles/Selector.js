@@ -12,10 +12,10 @@ export default css`
 }
 
 .environment-selector {
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   min-height: 36px;
-  cursor: pointer;
   margin-bottom: 20px;
 }
 
@@ -34,7 +34,7 @@ export default css`
 
 .separator {
   height: 1px;
-  background-color: #e5e5e5;
+  background-color: var(--separator-color, #e5e5e5);
   margin: 8px 0;
 }
 
