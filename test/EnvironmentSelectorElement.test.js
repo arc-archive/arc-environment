@@ -1,9 +1,10 @@
 import { assert, html, fixture, nextFrame, oneEvent } from '@open-wc/testing';
 import { DataGenerator } from '@advanced-rest-client/arc-data-generator';
-import '../environment-selector.js';
 import { ArcModelEventTypes } from '@advanced-rest-client/arc-models';
+import sinon from 'sinon';
 import { resetSelection } from './ModelUtils.js';
 import { envSelectorOpened, } from '../src/EnvironmentSelectorElement.js';
+import '../environment-selector.js';
 // import { variableValueLabel } from '../src/Utils.js';
 
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCVariable} ARCVariable */
@@ -127,11 +128,13 @@ describe('EnvironmentSelectorElement', () => {
     });
 
     it('selects a new environment', async () => {
+      const spy = sinon.spy();
+      element.addEventListener(ArcModelEventTypes.Environment.select, spy);
       const env = environments[3];
       const node = /** @type HTMLElement */ (element.shadowRoot.querySelector(`anypoint-icon-item[data-id="${env._id}"]`));
       node.click();
 
-      await oneEvent(window, ArcModelEventTypes.Environment.State.select);
+      assert.isTrue(spy.called);
     });
   });
 

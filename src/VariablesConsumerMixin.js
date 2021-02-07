@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { ArcModelEvents, ArcModelEventTypes } from '@advanced-rest-client/arc-models';
-import { ConfigEvents, ConfigEventTypes } from '@advanced-rest-client/arc-events';
+import { ConfigEvents, ConfigEventTypes, DataImportEventTypes } from '@advanced-rest-client/arc-events';
 import { dedupeMixin } from '@open-wc/dedupe-mixin';
 // eslint-disable-next-line no-unused-vars
 import { LitElement } from 'lit-element';
@@ -14,7 +14,7 @@ import { LitElement } from 'lit-element';
 /** @typedef {import('@advanced-rest-client/arc-models').ARCVariableUpdatedEvent} ARCVariableUpdatedEvent */
 /** @typedef {import('@advanced-rest-client/arc-models').ARCModelStateDeleteEvent} ARCModelStateDeleteEvent */
 /** @typedef {import('@advanced-rest-client/arc-events').ConfigStateUpdateEvent} ConfigStateUpdateEvent */
-/** @typedef {import('./VariablesConsumerMixin').SystemVariables} SystemVariables */
+/** @typedef {import('@advanced-rest-client/arc-types').Variable.SystemVariables} SystemVariables */
 
 export const environmentValue = Symbol('environmentValue');
 export const environmentDeleteHandler = Symbol('environmentDeleteHandler');
@@ -27,6 +27,7 @@ export const configChangeHandler = Symbol('configChangeHandler');
 export const systemVariablesValue = Symbol('systemVariablesValue');
 export const systemVariablesModel = Symbol('systemVariablesModel');
 export const processSystemVariables = Symbol('processSystemVariables');
+export const dataImportedHandler = Symbol('dataImportedHandler');
 
 export const defaultEnvironmentLabel = 'Default';
 
@@ -133,6 +134,7 @@ const mxFunction = (base) => {
       this[variableUpdateHandler] = this[variableUpdateHandler].bind(this);
       this[datastoreDestroyedHandler] = this[datastoreDestroyedHandler].bind(this);
       this[configChangeHandler] = this[configChangeHandler].bind(this);
+      this[dataImportedHandler] = this[dataImportedHandler].bind(this);
     }
 
     connectedCallback() {
@@ -146,6 +148,7 @@ const mxFunction = (base) => {
       window.addEventListener(ArcModelEventTypes.Variable.State.update, this[variableUpdateHandler]);
       window.addEventListener(ArcModelEventTypes.destroyed, this[datastoreDestroyedHandler]);
       window.addEventListener(ConfigEventTypes.State.update, this[configChangeHandler]);
+      window.addEventListener(DataImportEventTypes.dataImported, this[dataImportedHandler]);
     }
 
     disconnectedCallback() {
@@ -159,6 +162,7 @@ const mxFunction = (base) => {
       window.removeEventListener(ArcModelEventTypes.Variable.State.update, this[variableUpdateHandler]);
       window.removeEventListener(ArcModelEventTypes.destroyed, this[datastoreDestroyedHandler]);
       window.removeEventListener(ConfigEventTypes.State.update, this[configChangeHandler]);
+      window.removeEventListener(DataImportEventTypes.dataImported, this[dataImportedHandler]);
     }
 
     /**
@@ -188,7 +192,7 @@ const mxFunction = (base) => {
      */
     async refreshEnvironments() {
       const record = await ArcModelEvents.Environment.list(this, { readall: true });
-      this.environments = record.items;
+      this.environments = record && record.items;
       await this.requestUpdate();
     }
 
@@ -373,6 +377,15 @@ const mxFunction = (base) => {
       if (key === 'request.useSystemVariables') {
         this.systemVariablesEnabled = value;
       }
+    }
+
+    /**
+     * Handler for the data imported event.
+     * Refreshes the current environment and the list of environments.
+     */
+    async [dataImportedHandler]() {
+      await this.refreshEnvironment();
+      await this.refreshEnvironments();
     }
   }
   return VariablesConsumerMixin;
