@@ -502,7 +502,9 @@ export class VariablesProcessor {
         continue;
       }
       if (!variable) {
-        throw new Error('Syntax error. Unclosed curly bracket.');
+        // https://github.com/advanced-rest-client/arc-environment/issues/2
+        // This may not be error, even if so, don't throw it in here, just ignore the expression
+        return value;
       }
       if (!isAPILiteral) {
         variable = variable.substr(1);

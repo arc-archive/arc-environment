@@ -98,6 +98,7 @@ describe('VariablesRunner', () => {
       ],
       ['https://{host}.domain.com', 'https://api.domain.com'],
       ['https://api.domain.com/a/{path}/b', 'https://api.domain.com/a/path/b'],
+      [JSON.stringify({data: { complex: true }}, null, 2), '{\n  "data": {\n    "complex": true\n  }\n}'],
     ].forEach(([src, value]) => {
       it(`${src}`, async () => {
         const result = await instance.evaluateVariable(src);
@@ -395,16 +396,9 @@ describe('VariablesRunner', () => {
       assert.equal(result, 'test te s+t');
     });
 
-    it('rejects invalid input', async () => {
-      try {
-        await instance
-          .evaluateVariable('test ${test');
-        throw new Error('TEST');
-      } catch (cause) {
-        if (cause.message === 'TEST') {
-          throw new Error('Passed invalid value');
-        }
-      }
+    it('ignores invalid input', async () => {
+      const result = await instance.evaluateVariable('test ${test');
+      assert.equal(result, 'test ${test');
     });
 
     it('does not evaluate object', async () => {
@@ -471,10 +465,8 @@ describe('VariablesRunner', () => {
       assert.equal(instance._prepareValue('test ${val}'), "'test ' + val + ''");
     });
 
-    it('Throws error for bad syntax', () => {
-      assert.throws(() => {
-        instance._prepareValue('test ${val');
-      }, Error);
+    it('does not throw error for bad syntax', () => {
+      instance._prepareValue('test ${val');
     });
 
     it('Prepares string with complex structure', () => {
