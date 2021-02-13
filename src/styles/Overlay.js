@@ -37,6 +37,7 @@ export default css`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-bottom: 4px;
 }
 
 .system-variables {
