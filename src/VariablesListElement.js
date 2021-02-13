@@ -97,7 +97,7 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
     }
     const record = await ArcModelEvents.Variable.update(this, {
       environment,
-      name: 'new variable',
+      name: 'newVariable',
       value: '',
       enabled: false,
     });
