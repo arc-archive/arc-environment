@@ -4,7 +4,8 @@ export default css`
 :host {
   display: flex;
   flex-direction: column;
-  background-color: #fff;
+  background-color: var(--variables-overlay-background-color, #fff);
+  color: var(--variables-overlay-color, initial);
   box-shadow: var(--anypoint-dropdown-shadow);
   padding: 20px;
   border-radius: 12px;
@@ -36,6 +37,7 @@ export default css`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-bottom: 4px;
 }
 
 .system-variables {

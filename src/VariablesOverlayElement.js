@@ -18,6 +18,7 @@ export const footerTemplate = Symbol('footerTemplate');
 export const systemVariablesToggleTemplate = Symbol('systemVariablesToggleTemplate');
 export const closeHandler = Symbol('closeHandler');
 export const systemVarsToggleHandler = Symbol('systemVarsToggleHandler');
+export const listResizeHandler = Symbol('listResizeHandler');
 
 /**
  * `Renders an overlay with variables information.
@@ -72,10 +73,20 @@ export class VariablesOverlayElement extends VariablesConsumerMixin(ArcOverlayMi
     const input = /** @type HTMLInputElement */ (e.target);
     await this.toggleSystemVariables(input.checked);
     this.notifyResize();
+    this.refit();
   }
 
   [closeHandler]() {
     this.close();
+  }
+
+  /**
+   * Re fits the overlay when the list resize.
+   */
+  [listResizeHandler]() {
+    if (this.opened) {
+      this.refit();
+    }
   }
 
   /**
@@ -130,6 +141,7 @@ export class VariablesOverlayElement extends VariablesConsumerMixin(ArcOverlayMi
       .compatibility="${this.compatibility}"
       .outlined="${this.outlined}"
       class="environment-variables"
+      @resize="${this[listResizeHandler]}"
     ></variables-list>`;
   }
 

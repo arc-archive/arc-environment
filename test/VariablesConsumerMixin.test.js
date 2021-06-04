@@ -1,10 +1,10 @@
+/* eslint-disable arrow-body-style */
 /* eslint-disable prefer-destructuring */
-import { assert, defineCE, fixture, aTimeout } from '@open-wc/testing';
+import { assert, defineCE, fixture, aTimeout, nextFrame } from '@open-wc/testing';
 import { DataGenerator } from '@advanced-rest-client/arc-data-generator';
 import sinon from 'sinon';
 import { LitElement } from 'lit-element';
-import { ArcModelEvents, ArcModelEventTypes } from '@advanced-rest-client/arc-models';
-import { ConfigEventTypes, ConfigEvents } from '@advanced-rest-client/arc-events';
+import { ArcModelEvents, ArcModelEventTypes, ConfigEventTypes, ConfigEvents, ImportEvents } from '@advanced-rest-client/arc-events';
 import { VariablesConsumerMixin } from '../index.js';
 import { systemVariablesModel, systemVariablesValue } from '../src/VariablesConsumerMixin.js';
 import { resetSelection } from './ModelUtils.js';
@@ -586,6 +586,30 @@ describe('VariablesConsumerMixin', () => {
       it('ignores other keys', () => {
         ConfigEvents.State.update(document.body, 'request.other', true);
         assert.isFalse(element.systemVariablesEnabled);
+      });
+    });
+
+    describe('data import event', () => {
+      let element = /** @type VariablesConsumer */ (null);
+      beforeEach(async () => {
+        element = await basicFixture();
+      });
+
+      it('refreshes the current environment', async () => {
+        const spy = sinon.spy(element, 'refreshEnvironment');
+        ImportEvents.dataImported(document.body);
+        await nextFrame();
+        assert.isTrue(spy.called);
+      });
+
+      it('refreshes the list of environments', async () => {
+        const spy = sinon.spy(element, 'refreshEnvironments');
+        ImportEvents.dataImported(document.body);
+        // there are two function calls with `await`. This is the second one
+        // and it waits here to be sure that first function finishes which is 
+        // dependent on the speed of the IDB.
+        await aTimeout(100);
+        assert.isTrue(spy.called);
       });
     });
   });

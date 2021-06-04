@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map.js';
-import { ArcModelEvents } from '@advanced-rest-client/arc-models';
+import { ArcModelEvents } from '@advanced-rest-client/arc-events';
 import { ArcResizableMixin } from '@advanced-rest-client/arc-resizable-mixin';
 import '@anypoint-web-components/anypoint-input/anypoint-input.js';
 import '@anypoint-web-components/anypoint-input/anypoint-masked-input.js';
@@ -97,7 +97,7 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
     }
     const record = await ArcModelEvents.Variable.update(this, {
       environment,
-      name: 'new variable',
+      name: 'newVariable',
       value: '',
       enabled: false,
     });

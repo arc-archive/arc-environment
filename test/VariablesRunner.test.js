@@ -98,6 +98,7 @@ describe('VariablesRunner', () => {
       ],
       ['https://{host}.domain.com', 'https://api.domain.com'],
       ['https://api.domain.com/a/{path}/b', 'https://api.domain.com/a/path/b'],
+      [JSON.stringify({data: { complex: true }}, null, 2), '{\n  "data": {\n    "complex": true\n  }\n}'],
     ].forEach(([src, value]) => {
       it(`${src}`, async () => {
         const result = await instance.evaluateVariable(src);
@@ -202,13 +203,17 @@ describe('VariablesRunner', () => {
 
     it('returns the same string without variables', async () => {
       const tmp = { ...obj };
-      const result = await instance.evaluateVariables(tmp, ['var4']);
+      const result = await instance.evaluateVariables(tmp, {
+        names: ['var4'],
+      });
       assert.equal(result.var4, 'hello');
     });
 
     it('evaluates only listed properties', async () => {
       const tmp = { ...obj };
-      const result = await instance.evaluateVariables(tmp, ['var1']);
+      const result = await instance.evaluateVariables(tmp, {
+        names: ['var1'],
+      });
       assert.equal(result.var1, 'value1');
       assert.equal(result.var2, '${test2}');
       assert.equal(result.var3, 'test-${test4}');
@@ -222,6 +227,29 @@ describe('VariablesRunner', () => {
       assert.equal(result.var2, 'value2 value1');
       assert.equal(result.var3, 'test-value4');
       assert.equal(result.var4, 'hello');
+    });
+
+    it('uses the "override" property', async () => {
+      const tmp = { ...obj };
+      const result = await instance.evaluateVariables(tmp, {
+        override: {
+          test1: 'override-1',
+          test2: 'override-2',
+        },
+      });
+      assert.equal(result.var1, 'override-1');
+      assert.equal(result.var2, 'override-2');
+    });
+
+    it('uses the "context" property', async () => {
+      const tmp = { ...obj };
+      const result = await instance.evaluateVariables(tmp, {
+        context: {
+          test1: 'context-1',
+        },
+      });
+      assert.equal(result.var1, 'context-1');
+      assert.equal(result.var2, 'undefined');
     });
   });
 
@@ -264,16 +292,14 @@ describe('VariablesRunner', () => {
       instance = new VariablesProcessor(jexl, vars);
     });
 
-    it('returns the same string without variables', () => {
-      return instance.evaluateVariable('test').then(result => {
-        assert.equal(result, 'test');
-      });
+    it('returns the same string without variables', async () => {
+      const result = await instance.evaluateVariable('test');
+      assert.equal(result, 'test');
     });
 
-    it('returns value for variable', () => {
-      return instance.evaluateVariable('test ${test1}').then(result => {
-        assert.equal(result, 'test value1');
-      });
+    it('returns value for variable', async () => {
+      const result = await instance.evaluateVariable('test ${test1}');
+      assert.equal(result, 'test value1');
     });
 
     it('evaluates JSON string', async () => {
@@ -282,126 +308,97 @@ describe('VariablesRunner', () => {
       assert.equal(result, '{\n\t"v1":"value1",\n\t"v2": "value2 value1"\n}');
     });
 
-    it('Should return value for complex variable', () => {
-      return instance.evaluateVariable('test ${test3}').then(result => {
-        assert.equal(result, 'test value3 value4');
+    it('Should return value for complex variable', async () => {
+      const result = await instance.evaluateVariable('test ${test3}');
+      assert.equal(result, 'test value3 value4');
+    });
+
+    it('uses "override" from options', async () => {
+      const result = await instance.evaluateVariable('test ${test3}', {
+        override: { test3: 'value3' },
       });
+      assert.equal(result, 'test value3');
     });
 
-    it('Should use context from arguments', () => {
-      return instance
-        .evaluateVariable('test ${test3}', { test3: 'value3' })
-        .then(result => {
-          assert.equal(result, 'test value3');
-        });
+    it('Should evaluate legacy now function', async () => {
+      const result = await instance.evaluateVariable('test ${now}');
+      const now = result.split(' ')[1];
+      assert.isFalse(Number.isNaN(now));
     });
 
-    it('Should evaluate legacy now function', () => {
-      return instance.evaluateVariable('test ${now}').then(result => {
-        const now = result.split(' ')[1];
-        assert.isFalse(Number.isNaN(now));
-      });
+    it('Should evaluate legacy now function with group', async () => {
+      const result = await instance.evaluateVariable('${now:1} ${now:2} ${now:1}');
+      const values = result.split(' ');
+      assert.isFalse(Number.isNaN(values[0]));
+      assert.equal(values[0], values[2]);
     });
 
-    it('Should evaluate legacy now function with group', () => {
-      return instance
-        .evaluateVariable('${now:1} ${now:2} ${now:1}')
-        .then(result => {
-          const values = result.split(' ');
-          assert.isFalse(Number.isNaN(values[0]));
-          assert.equal(values[0], values[2]);
-        });
+    it('Should evaluate legacy random function', async () => {
+      const result = await instance.evaluateVariable('test ${random}');
+      const value = result.split(' ')[1];
+      assert.isFalse(Number.isNaN(value));
     });
 
-    it('Should evaluate legacy random function', () => {
-      return instance.evaluateVariable('test ${random}').then(result => {
-        const value = result.split(' ')[1];
-        assert.isFalse(Number.isNaN(value));
-      });
+    it('Should evaluate legacy random function with group', async () => {
+      const result = await instance
+        .evaluateVariable('${random:1} ${random:2} ${random:1}');
+      const values = result.split(' ');
+      assert.isFalse(Number.isNaN(values[0]));
+      assert.equal(values[0], values[2]);
+      assert.notEqual(values[1], values[2]);
     });
 
-    it('Should evaluate legacy random function with group', () => {
-      return instance
-        .evaluateVariable('${random:1} ${random:2} ${random:1}')
-        .then(result => {
-          const values = result.split(' ');
-          assert.isFalse(Number.isNaN(values[0]));
-          assert.equal(values[0], values[2]);
-          assert.notEqual(values[1], values[2]);
-        });
+    it('Should evaluate now()', async () => {
+      const result = await instance.evaluateVariable('test now()');
+      const now = result.split(' ')[1];
+      assert.isFalse(Number.isNaN(now));
     });
 
-    it('Should evaluate now()', () => {
-      return instance.evaluateVariable('test now()').then(result => {
-        const now = result.split(' ')[1];
-        assert.isFalse(Number.isNaN(now));
-      });
+    it('Should evaluate now() with group', async () => {
+      const result = await instance.evaluateVariable('now(1) now(2) now(1)');
+      const values = result.split(' ');
+      assert.equal(values[0], values[2]);
     });
 
-    it('Should evaluate now() with group', () => {
-      return instance.evaluateVariable('now(1) now(2) now(1)').then(result => {
-        const values = result.split(' ');
-        assert.equal(values[0], values[2]);
-      });
+    it('Should evaluate random()', async () => {
+      const result = await instance.evaluateVariable('test random()');
+      const now = result.split(' ')[1];
+      assert.isFalse(Number.isNaN(now));
     });
 
-    it('Should evaluate random()', () => {
-      return instance.evaluateVariable('test random()').then(result => {
-        const now = result.split(' ')[1];
-        assert.isFalse(Number.isNaN(now));
-      });
+    it('Should evaluate random() with group', async () => {
+      const result = await instance
+        .evaluateVariable('random(1) random(2) random(1)');
+      const values = result.split(' ');
+      assert.equal(values[0], values[2]);
     });
 
-    it('Should evaluate random() with group', () => {
-      return instance
-        .evaluateVariable('random(1) random(2) random(1)')
-        .then(result => {
-          const values = result.split(' ');
-          assert.equal(values[0], values[2]);
-        });
+    it('Should evaluate Math function', async () => {
+      const result = await instance.evaluateVariable('test Math.abs(-100)');
+      assert.equal(result, 'test 100');
     });
 
-    it('Should evaluate Math function', () => {
-      return instance.evaluateVariable('test Math.abs(-100)').then(result => {
-        assert.equal(result, 'test 100');
-      });
+    it('Should evaluate String function', async () => {
+      const result = await instance
+        .evaluateVariable('test String.toUpperCase(test)');
+      assert.equal(result, 'test TEST');
     });
 
-    it('Should evaluate String function', () => {
-      return instance
-        .evaluateVariable('test String.toUpperCase(test)')
-        .then(result => {
-          assert.equal(result, 'test TEST');
-        });
+    it('Should evaluate encodeURIComponent()', async () => {
+      const result = await instance
+        .evaluateVariable('test encodeURIComponent(te s+t)');
+      assert.equal(result, 'test te%20s%2Bt');
     });
 
-    it('Should evaluate encodeURIComponent()', () => {
-      return instance
-        .evaluateVariable('test encodeURIComponent(te s+t)')
-        .then(result => {
-          assert.equal(result, 'test te%20s%2Bt');
-        });
+    it('evaluates decodeURIComponent()', async () => {
+      const result = await instance
+        .evaluateVariable('test decodeURIComponent(te%20s%2Bt)');
+      assert.equal(result, 'test te s+t');
     });
 
-    it('evaluates decodeURIComponent()', () => {
-      return instance
-        .evaluateVariable('test decodeURIComponent(te%20s%2Bt)')
-        .then(result => {
-          assert.equal(result, 'test te s+t');
-        });
-    });
-
-    it('rejects invalid input', () => {
-      return instance
-        .evaluateVariable('test ${test')
-        .then(() => {
-          throw new Error('TEST');
-        })
-        .catch(cause => {
-          if (cause.message === 'TEST') {
-            throw new Error('Passed invalid value');
-          }
-        });
+    it('ignores invalid input', async () => {
+      const result = await instance.evaluateVariable('test ${test');
+      assert.equal(result, 'test ${test');
     });
 
     it('does not evaluate object', async () => {
@@ -468,10 +465,8 @@ describe('VariablesRunner', () => {
       assert.equal(instance._prepareValue('test ${val}'), "'test ' + val + ''");
     });
 
-    it('Throws error for bad syntax', () => {
-      assert.throws(() => {
-        instance._prepareValue('test ${val');
-      }, Error);
+    it('does not throw error for bad syntax', () => {
+      instance._prepareValue('test ${val');
     });
 
     it('Prepares string with complex structure', () => {
@@ -516,16 +511,12 @@ describe('VariablesRunner', () => {
       instance = new VariablesProcessor(jexl, variables);
     });
 
-    it('Should create a context', () => {
-      return instance.buildContext();
-    });
-
-    it('Sets variable value', async () => {
+    it('sets variable value', async () => {
       const context = await instance.buildContext();
       assert.equal(context.test2, 'value2 value1');
     });
 
-    it('Sets variable value defined later', async () => {
+    it('sets variable value defined later', async () => {
       const context = await instance.buildContext();
       assert.equal(context.test3, 'value3 value4');
     });

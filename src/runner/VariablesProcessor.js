@@ -9,7 +9,7 @@ import { EvalFunctions } from './EvalFunctions.js';
 import { clear, find, store } from './Cache.js'; // these methods need to be there.
 
 /** @typedef {import('../types').VariablesMap} VariablesMap */
-/** @typedef {import('../types').Overrides} Overrides */
+/** @typedef {import('../types').EvaluateOptions} EvaluateOptions */
 /** @typedef {import('@advanced-rest-client/arc-models').ARCVariable} ARCVariable */
 /** @typedef {import('jexl')} Jexl */
 
@@ -45,10 +45,7 @@ export class VariablesProcessor {
    *
    * If the `variables-manager` is not present it returns empty object.
    *
-   * @param {Overrides=} override Map of key - value pars to override variables
-   * or to add temporary variables to the context. Values for keys that
-   * exists in variables array (the `variable` property) will update value of
-   * the variable. Rest is added to the list.
+   * @param {VariablesMap=} override Optional map of variables to use to override the built context.
    * @return {Promise<VariablesMap>} Promise resolved to the context to be passed to Jexl.
    */
   async buildContext(override = {}) {
@@ -67,7 +64,7 @@ export class VariablesProcessor {
   /**
    * Overrides variables with passed values.
    * @param {ARCVariable[]} variables Variables to
-   * @param {Overrides} override Values to override the variables with
+   * @param {VariablesMap} override Values to override the variables with
    * @return {ARCVariable[]} A copy the `variables` object
    */
   overrideContext(variables, override) {
@@ -102,11 +99,10 @@ export class VariablesProcessor {
    * Evaluates a value against the variables in the current environment
    *
    * @param {string} value A value to evaluate
-   * @param {Overrides=} override A list of variables to override in created context.
-   * @param {VariablesMap=} context 
+   * @param {EvaluateOptions=} options Execution options
    * @return {Promise<string>} Promise that resolves to the evaluated value.
    */
-  async evaluateVariable(value, override, context) {
+  async evaluateVariable(value, options={}) {
     const typeOf = typeof value;
     // Non primitives + null
     if (typeOf === 'object') {
@@ -115,28 +111,37 @@ export class VariablesProcessor {
     if (typeOf !== 'string') {
       value = String(value);
     }
+    const { context, override } = options;
     const ctx = context || await this.buildContext(override);
     return this.evaluateWithContext(ctx, value);
   }
 
   /**
-   * Recursively evaluate variables on an object.
+   * Evaluates variables on the passed object.
+   * 
+   * Note, it only performs a shallow evaluation. Deep objects are not evaluated.
    *
-   * @param {VariablesMap} obj The map containing variables
-   * @param {string[]=} props Optional, list of properties to evaluate. If not set then it scans for all keys in the object.
-   * @return {Promise<VariablesMap>} Promise resolved to the evaluated object.
+   * @param {any} obj The object to evaluate.
+   * @param {EvaluateOptions=} options Execution options
+   * @return {Promise<any>} Promise resolved to the evaluated object.
    */
-  async evaluateVariables(obj, props) {
-    props = props || Object.keys(obj);
-    const prop = props.shift();
+  async evaluateVariables(obj, options={}) {
+    const init = { ...options };
+    const names = [...(init.names || Object.keys(obj))];
+    init.names = names
+    if (!init.context) {
+      // this should be done ony once, not each time it evaluates a variable.
+      init.context = await this.buildContext(init.override);
+    }
+    const prop = names.shift();
     if (!prop) {
       return obj;
     }
     if (!obj[prop]) {
-      return this.evaluateVariables(obj, props);
+      return this.evaluateVariables(obj, init);
     }
-    obj[prop] = await this.evaluateVariable(obj[prop]);
-    return this.evaluateVariables(obj, props);
+    obj[prop] = await this.evaluateVariable(obj[prop], init);
+    return this.evaluateVariables(obj, init);
   }
 
   /**
@@ -173,12 +178,22 @@ export class VariablesProcessor {
         if (['{', '}'].includes(item.trim())) {
           items[items.length] = item;
         } else {
-          items[items.length] = await jexl.eval(item, context);
+          try {
+            items[items.length] = await jexl.eval(item, context);
+          } catch (e) {
+            items[items.length] = item;
+          }
         }
       }
       return items.join('\n');
     }
-    return jexl.eval(result, context);
+    let returnValue = value;
+    try {
+      returnValue = await jexl.eval(result, context);
+    } catch (e) {
+      // ...
+    }
+    return returnValue;
   }
 
   /**
@@ -205,7 +220,9 @@ export class VariablesProcessor {
     // because are a dependencies of other expressions.
     for (let i = 0, len = requireEvaluation.length; i < len; i++) {
       const item = requireEvaluation[i];
-      const value = await this.evaluateVariable(item.value, {}, result);
+      const value = await this.evaluateVariable(item.value, {
+        context: result,
+      });
       result[item.name] = value;
       item.value = value;
     }
@@ -480,8 +497,14 @@ export class VariablesProcessor {
         return this._wrapJsonValue(parsed, isJsonValue);
       }
       let variable = tokenizer.nextUntil('}');
+      if (variable === '') {
+        // let this pass.
+        continue;
+      }
       if (!variable) {
-        throw new Error('Syntax error. Unclosed curly bracket.');
+        // https://github.com/advanced-rest-client/arc-environment/issues/2
+        // This may not be error, even if so, don't throw it in here, just ignore the expression
+        return value;
       }
       if (!isAPILiteral) {
         variable = variable.substr(1);

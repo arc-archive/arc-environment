@@ -31,6 +31,9 @@ class ComponentDemo extends DemoPage {
     val += '  "group1": "${random(1)}",\n';
     val += '  "group2": "${random(2)}",\n';
     val += '  "group1again": "${random(1)}",\n';
+    val += '  "inner": {\n';
+    val += '    "complex": true\n';
+    val += '  }\n';
     val += '}';
     this.val = val;
 
