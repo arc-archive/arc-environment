@@ -1,4 +1,4 @@
-import { ArcModelEventTypes } from '@advanced-rest-client/arc-models';
+import { ArcModelEventTypes } from '@advanced-rest-client/arc-events';
 import { oneEvent } from '@open-wc/testing';
 
 export async function resetSelection() {

@@ -1,6 +1,6 @@
 import { assert, html, fixture, nextFrame, oneEvent } from '@open-wc/testing';
 import { DataGenerator } from '@advanced-rest-client/arc-data-generator';
-import { ArcModelEventTypes } from '@advanced-rest-client/arc-models';
+import { ArcModelEventTypes } from '@advanced-rest-client/arc-events';
 import sinon from 'sinon';
 import { resetSelection } from './ModelUtils.js';
 import { envSelectorOpened, } from '../src/EnvironmentSelectorElement.js';

@@ -3,7 +3,7 @@ import { assert, html, fixture, nextFrame, oneEvent } from '@open-wc/testing';
 import { DataGenerator } from '@advanced-rest-client/arc-data-generator';
 import sinon from 'sinon';
 import '../variables-list.js';
-import { ArcModelEventTypes } from '@advanced-rest-client/arc-models';
+import { ArcModelEventTypes } from '@advanced-rest-client/arc-events';
 import { varAddHandler, editedVariable, } from '../src/VariablesListElement.js';
 import { variableValueLabel } from '../src/Utils.js';
 

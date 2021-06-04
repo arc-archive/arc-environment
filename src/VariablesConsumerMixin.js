@@ -1,18 +1,17 @@
 /* eslint-disable class-methods-use-this */
-import { ArcModelEvents, ArcModelEventTypes } from '@advanced-rest-client/arc-models';
-import { ConfigEvents, ConfigEventTypes, DataImportEventTypes } from '@advanced-rest-client/arc-events';
+import { ArcModelEvents, ArcModelEventTypes, ConfigEvents, ConfigEventTypes, DataImportEventTypes } from '@advanced-rest-client/arc-events';
 import { dedupeMixin } from '@open-wc/dedupe-mixin';
 // eslint-disable-next-line no-unused-vars
 import { LitElement } from 'lit-element';
 
 /** @typedef {import('@advanced-rest-client/arc-models').ARCEnvironment} ARCEnvironment */
 /** @typedef {import('@advanced-rest-client/arc-models').ARCVariable} ARCVariable */
-/** @typedef {import('@advanced-rest-client/arc-models').ARCEnvironmentDeletedEvent} ARCEnvironmentDeletedEvent */
-/** @typedef {import('@advanced-rest-client/arc-models').ARCEnvironmentUpdatedEvent} ARCEnvironmentUpdatedEvent */
-/** @typedef {import('@advanced-rest-client/arc-models').ARCEnvironmentStateSelectEvent} ARCEnvironmentStateSelectEvent */
-/** @typedef {import('@advanced-rest-client/arc-models').ARCVariableDeletedEvent} ARCVariableDeletedEvent */
-/** @typedef {import('@advanced-rest-client/arc-models').ARCVariableUpdatedEvent} ARCVariableUpdatedEvent */
-/** @typedef {import('@advanced-rest-client/arc-models').ARCModelStateDeleteEvent} ARCModelStateDeleteEvent */
+/** @typedef {import('@advanced-rest-client/arc-events').ARCEnvironmentDeletedEvent} ARCEnvironmentDeletedEvent */
+/** @typedef {import('@advanced-rest-client/arc-events').ARCEnvironmentUpdatedEvent} ARCEnvironmentUpdatedEvent */
+/** @typedef {import('@advanced-rest-client/arc-events').ARCEnvironmentStateSelectEvent} ARCEnvironmentStateSelectEvent */
+/** @typedef {import('@advanced-rest-client/arc-events').ARCVariableDeletedEvent} ARCVariableDeletedEvent */
+/** @typedef {import('@advanced-rest-client/arc-events').ARCVariableUpdatedEvent} ARCVariableUpdatedEvent */
+/** @typedef {import('@advanced-rest-client/arc-events').ARCModelStateDeleteEvent} ARCModelStateDeleteEvent */
 /** @typedef {import('@advanced-rest-client/arc-events').ConfigStateUpdateEvent} ConfigStateUpdateEvent */
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.SystemVariables} SystemVariables */
 

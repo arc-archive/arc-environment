@@ -4,8 +4,7 @@ import { assert, defineCE, fixture, aTimeout, nextFrame } from '@open-wc/testing
 import { DataGenerator } from '@advanced-rest-client/arc-data-generator';
 import sinon from 'sinon';
 import { LitElement } from 'lit-element';
-import { ArcModelEvents, ArcModelEventTypes } from '@advanced-rest-client/arc-models';
-import { ConfigEventTypes, ConfigEvents, ImportEvents } from '@advanced-rest-client/arc-events';
+import { ArcModelEvents, ArcModelEventTypes, ConfigEventTypes, ConfigEvents, ImportEvents } from '@advanced-rest-client/arc-events';
 import { VariablesConsumerMixin } from '../index.js';
 import { systemVariablesModel, systemVariablesValue } from '../src/VariablesConsumerMixin.js';
 import { resetSelection } from './ModelUtils.js';

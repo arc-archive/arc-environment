@@ -1,69 +1,39 @@
-# \<arc-environment>
+# arc-environment
 
-This webcomponent follows the [open-wc](https://github.com/open-wc/open-wc) recommendation.
+The UI and logic related to environment and variables management in Advanced REST Client.
 
 ## Installation
+
 ```bash
-npm i arc-environment
+npm i @advanced-rest-client/arc-environment
 ```
 
 ## Usage
-```html
-<script type="module">
-  import 'arc-environment/arc-environment.js';
-</script>
 
-<arc-environment></arc-environment>
+The `variables-overlay` renders an overlay with a list of variables in the current environment. The `environment-selector` renders an UI to select an environment. The `variables-list` renders a basic list of variables.
+
+All of these elements are powered by `@advanced-rest-client/arc-models` which acts as a context store for the environments and variables.
+
+The `VariablesProcessor` is a class that processes input to look for variables and replaces them in the input. This is used in ARC to process the request data.
+
+The `VariablesConsumerMixin` can be used to extend a ListElement base to provide the element with functions and variables related to environments and variables.
+
+## Development
+
+```sh
+git clone https://github.com/advanced-rest-client/arc-actions
+cd arc-actions
+npm install
 ```
 
-## Linting with ESLint, Prettier, and Types
-To scan the project for linting errors, run
-```bash
-npm run lint
-```
+### Running the demo locally
 
-You can lint with ESLint and Prettier individually as well
-```bash
-npm run lint:eslint
-```
-```bash
-npm run lint:prettier
-```
-
-To automatically fix many linting errors, run
-```bash
-npm run format
-```
-
-You can format using ESLint and Prettier individually as well
-```bash
-npm run format:eslint
-```
-```bash
-npm run format:prettier
-```
-
-## Testing with Web Test Runner
-To run the suite of Web Test Runner tests, run
-```bash
-npm run test
-```
-
-To run the tests in watch mode (for <abbr title="test driven development">TDD</abbr>, for example), run
-
-```bash
-npm run test:watch
-```
-
-
-## Tooling configs
-
-For most of the tools, the configuration is in the `package.json` to reduce the amount of files in your project.
-
-If you customize the configuration a lot, you can consider moving them to individual files.
-
-## Local Demo with `web-dev-server`
-```bash
+```sh
 npm start
 ```
-To run a local development server that serves the basic demo located in `demo/index.html`
+
+### Running the tests
+
+```sh
+npm test
+```
