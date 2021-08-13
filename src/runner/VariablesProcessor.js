@@ -469,13 +469,25 @@ export class VariablesProcessor {
       return value;
     }
     let typedValue = String(value);
-    const isJsonValue =
-      typedValue[0] === '{' && typedValue[typedValue.length - 1] === '}';
+    let isJsonValue = typedValue[0] === '{' && typedValue[typedValue.length - 1] === '}';
     if (isJsonValue) {
-      typedValue = typedValue.substr(1, typedValue.length - 2);
+      try {
+        // to handle `{x} something {y}`
+        JSON.parse(typedValue);
+        typedValue = typedValue.substr(1, typedValue.length - 2);
+      } catch (e) {
+        isJsonValue = false;
+      }
     }
     const isJSLiteral = typedValue.includes('${');
-    const isAPILiteral = !isJSLiteral && typedValue.includes('{');
+    let isAPILiteral = !isJSLiteral && typedValue.includes('{');
+    if (!isJSLiteral && !isAPILiteral && isJsonValue) {
+      // this handles the case when the value contains a single variable in
+      // the URL variables syntax.
+      isAPILiteral = true;
+      isJsonValue = false;
+      typedValue = `{${typedValue}}`;
+    }
     if (!isJSLiteral && !isAPILiteral) {
       return value;
     }

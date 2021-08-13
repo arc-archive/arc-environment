@@ -19,7 +19,6 @@
   },
   "include": [
     "**/*.js",
-    "node_modules/@open-wc/**/*.js", "src/EnvironmentSelectorElement.d.ts", "variables-overlay.d.ts", "variables-list.d.ts", "src/VariablesListElement.d.ts", "src/VariablesOverlayElement.d.ts", "src/runner/VariablesProcessor.d.ts", "index.d.ts"
-  ],
+    "node_modules/@open-wc/**/*.js", "src/EnvironmentSelectorElement.d.ts", "variables-overlay.d.ts", "variables-list.d.ts", "src/VariablesListElement.d.ts", "src/VariablesOverlayElement.d.ts", "src/runner/VariablesProcessor.d.ts", "index.d.ts", "src/VariablesSuggestionsElement.d.ts"  ],
   "exclude": ["node_modules/!(@open-wc)"]
 }

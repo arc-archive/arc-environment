@@ -58,6 +58,7 @@
     "@advanced-rest-client/arc-data-generator": "^4.0.0",
     "@advanced-rest-client/arc-demo-helper": "^3.0.2",
     "@anypoint-web-components/anypoint-checkbox": "^1.2.1",
+    "@api-client/context-menu": "^0.1.10",
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
     "@open-wc/eslint-config": "^4.3.0",
