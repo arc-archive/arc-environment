@@ -204,6 +204,8 @@ export default class VariablesSuggestionsElement extends VariablesConsumerMixin(
     }
     const { input } = this;
     const { name } = item.dataset;
+    list.selected = undefined;
+    this.opened = false;
     if (!input || this.preferEvent) {
       this.dispatchEvent(new CustomEvent('select', {
         detail: name,
@@ -220,7 +222,6 @@ export default class VariablesSuggestionsElement extends VariablesConsumerMixin(
     input.value = updated;
     input.dispatchEvent(new Event('input'));
     input.dispatchEvent(new Event('change'));
-    this.opened = false;
   }
 
   /**

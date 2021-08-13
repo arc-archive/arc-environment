@@ -211,7 +211,7 @@ describe('VariablesSuggestionsElement', () => {
       it('handles pressing Enter on the input when opened and not highlighted', () => {
         element.input = input;
         const list = element.shadowRoot.querySelector('anypoint-listbox');
-        assert.notOk(list.selectedItem, 'the list has no highlighted item');
+        const [item] = list.items;
         
         const e = new KeyboardEvent('keydown', {
           code: 'Enter',
@@ -219,14 +219,14 @@ describe('VariablesSuggestionsElement', () => {
         });
         input.dispatchEvent(e);
         assert.isTrue(e.defaultPrevented, 'the event is cancelled');
-        assert.ok(list.selectedItem, 'the list has selected item');
+        const { name } = item.dataset;
+        assert.equal(input.value, `{${name}}`, 'has the first value');
       });
 
       it('handles pressing Enter on the input when opened and highlighted', () => {
         element.input = input;
         const list = element.shadowRoot.querySelector('anypoint-listbox');
         list.highlightNext();
-        assert.notOk(list.selectedItem, 'the list has no highlighted item');
         
         const e = new KeyboardEvent('keydown', {
           code: 'Enter',
@@ -234,7 +234,8 @@ describe('VariablesSuggestionsElement', () => {
         });
         input.dispatchEvent(e);
         assert.isTrue(e.defaultPrevented, 'the event is cancelled');
-        assert.isTrue(list.selectedItem === list.highlightedItem, 'the list selects the highlighted item');
+        const { name } = list.highlightedItem.dataset;
+        assert.equal(input.value, `{${name}}`, 'has the highlighted value');
       });
 
       it('ignores Enter when not opened', () => {
@@ -258,6 +259,21 @@ describe('VariablesSuggestionsElement', () => {
         const { name } = item.dataset;
         item.click();
         assert.equal(input.value, `{${name}}`);
+      });
+
+      it('resets the list selection', () => {
+        element.input = input;
+        const item = element.shadowRoot.querySelector('anypoint-item');
+        item.click();
+        const list = element.shadowRoot.querySelector('anypoint-listbox');
+        assert.isUndefined(list.selected);
+      });
+
+      it('closes the list', () => {
+        element.input = input;
+        const item = element.shadowRoot.querySelector('anypoint-item');
+        item.click();
+        assert.isFalse(element.opened);
       });
 
       it('changes input value when has value', () => {
