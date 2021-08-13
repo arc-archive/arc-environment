@@ -1,6 +1,6 @@
 /* eslint-disable prefer-destructuring */
 import { assert, html, fixture, nextFrame, oneEvent } from '@open-wc/testing';
-import { DataGenerator } from '@advanced-rest-client/arc-data-generator';
+import { ArcMock } from '@advanced-rest-client/arc-data-generator';
 import sinon from 'sinon';
 import '../variables-list.js';
 import { ArcModelEventTypes } from '@advanced-rest-client/arc-events';
@@ -12,7 +12,7 @@ import { variableValueLabel } from '../src/Utils.js';
 /** @typedef {import('../index').VariablesListElement} VariablesListElement */
 
 describe('VariablesListElement', () => {
-  const generator = new DataGenerator();
+  const generator = new ArcMock();
 
   /**
    * @param {array=} vars
@@ -103,7 +103,7 @@ describe('VariablesListElement', () => {
     });
 
     after(async () => {
-      await generator.destroyVariablesData();
+      await generator.store.destroyVariables();
     });
 
     it('dispatches the update event', async () => {
@@ -122,9 +122,8 @@ describe('VariablesListElement', () => {
   describe('list items rendering', () => {
     let element = /** @type VariablesListElement */ (null);
     beforeEach(async () => {
-      const variables = generator.generateVariablesData({
+      const variables = generator.variables.listVariables(10, {
         defaultEnv: true,
-        size: 10,
       });
       element = await basicFixture(variables);
     });
@@ -174,20 +173,19 @@ describe('VariablesListElement', () => {
 
   describe('variable editing', () => {
     before(async () => {
-      await generator.insertVariablesData({
+      await generator.store.insertVariables(10, {
         defaultEnv: true,
-        size: 10,
       });
     });
 
     after(async () => {
-      await generator.destroyVariablesData();
+      await generator.store.destroyVariables();
     });
     
     let element = /** @type VariablesListElement */ (null);
     let variables = /** @type ARCVariable[] */ (null);
     beforeEach(async () => {
-      variables = await generator.getDatastoreVariablesData();
+      variables = await generator.store.getDatastoreVariablesData();
       assert.isAbove(variables.length, 0, 'has generated variables');
       element = await basicFixture(variables);
     });
@@ -267,20 +265,19 @@ describe('VariablesListElement', () => {
 
   describe('variable deleting', () => {
     before(async () => {
-      await generator.insertVariablesData({
+      await generator.store.insertVariables(10, {
         defaultEnv: true,
-        size: 10,
       });
     });
 
     after(async () => {
-      await generator.destroyVariablesData();
+      await generator.store.destroyVariables();
     });
     
     let element = /** @type VariablesListElement */ (null);
     let variables = /** @type ARCVariable[] */ (null);
     beforeEach(async () => {
-      variables = await generator.getDatastoreVariablesData();
+      variables = await generator.store.getDatastoreVariablesData();
       assert.isAbove(variables.length, 0, 'has generated variables');
       element = await basicFixture(variables);
     });

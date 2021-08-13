@@ -1,5 +1,5 @@
 import { assert, html, fixture, nextFrame, oneEvent } from '@open-wc/testing';
-import { DataGenerator } from '@advanced-rest-client/arc-data-generator';
+import { ArcMock } from '@advanced-rest-client/arc-data-generator';
 import { ArcModelEventTypes } from '@advanced-rest-client/arc-events';
 import sinon from 'sinon';
 import { resetSelection } from './ModelUtils.js';
@@ -12,7 +12,7 @@ import '../environment-selector.js';
 /** @typedef {import('../index').EnvironmentSelectorElement} EnvironmentSelectorElement */
 
 describe('EnvironmentSelectorElement', () => {
-  const generator = new DataGenerator();
+  const generator = new ArcMock();
 
   /**
    * @param {ARCEnvironment=} environment
@@ -24,15 +24,14 @@ describe('EnvironmentSelectorElement', () => {
   }
 
   before(async () => {
-    await generator.insertVariablesAndEnvironments({
+    await generator.store.insertVariablesAndEnvironments(5, {
       randomEnv: true,
-      size: 5,
     });
   });
 
   after(async () => {
     await resetSelection();
-    await generator.destroyVariablesData();
+    await generator.store.destroyVariables();
   });
 
   describe('No data state', () => {
@@ -115,7 +114,7 @@ describe('EnvironmentSelectorElement', () => {
     let environments = /** @type ARCEnvironment[] */ (null);
 
     before(async () => {
-      environments = await generator.getDatastoreEnvironmentsData();
+      environments = await generator.store.getDatastoreEnvironmentsData();
     });
 
     beforeEach(async () => {
@@ -143,7 +142,7 @@ describe('EnvironmentSelectorElement', () => {
     let environments = /** @type ARCEnvironment[] */ (null);
 
     before(async () => {
-      environments = await generator.getDatastoreEnvironmentsData();
+      environments = await generator.store.getDatastoreEnvironmentsData();
     });
 
     beforeEach(async () => {

@@ -1,6 +1,6 @@
 /* eslint-disable prefer-destructuring */
 import { assert, html, fixture, nextFrame, oneEvent } from '@open-wc/testing';
-import { DataGenerator } from '@advanced-rest-client/arc-data-generator';
+import { ArcMock } from '@advanced-rest-client/arc-data-generator';
 import '../variables-overlay.js';
 import { resetSelection } from './ModelUtils.js';
 
@@ -9,7 +9,7 @@ import { resetSelection } from './ModelUtils.js';
 /** @typedef {import('../index').VariablesOverlayElement} VariablesOverlayElement */
 
 describe('VariablesOverlayElement', () => {
-  const generator = new DataGenerator();
+  const generator = new ArcMock();
 
   /**
    * @returns {Promise<VariablesOverlayElement>}
@@ -34,19 +34,17 @@ describe('VariablesOverlayElement', () => {
   }
 
   before(async () => {
-    await generator.insertVariablesAndEnvironments({
+    await generator.store.insertVariablesAndEnvironments(5, {
       defaultEnv: true,
-      size: 5,
     });
-    await generator.insertVariablesAndEnvironments({
+    await generator.store.insertVariablesAndEnvironments(5, {
       randomEnv: true,
-      size: 5,
     });
   });
 
   after(async () => {
     await resetSelection();
-    await generator.destroyVariablesData();
+    await generator.store.destroyVariables();
   });
 
   describe('view rendering', () => {

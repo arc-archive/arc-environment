@@ -1,7 +1,7 @@
 /* eslint-disable arrow-body-style */
 /* eslint-disable prefer-destructuring */
 import { assert, defineCE, fixture, aTimeout, nextFrame } from '@open-wc/testing';
-import { DataGenerator } from '@advanced-rest-client/arc-data-generator';
+import { ArcMock } from '@advanced-rest-client/arc-data-generator';
 import sinon from 'sinon';
 import { LitElement } from 'lit-element';
 import { ArcModelEvents, ArcModelEventTypes, ConfigEventTypes, ConfigEvents, ImportEvents } from '@advanced-rest-client/arc-events';
@@ -20,7 +20,7 @@ const tag = defineCE(
 /** @typedef {VariablesConsumerMixin & LitElement} VariablesConsumer */
 
 describe('VariablesConsumerMixin', () => {
-  const generator = new DataGenerator();
+  const generator = new ArcMock();
 
   /**
    * @returns {Promise<VariablesConsumer>}
@@ -37,10 +37,10 @@ describe('VariablesConsumerMixin', () => {
   function generateEnvironments(size=10) {
     return new Array(size).fill(0).map(() => {
       return /** @type ARCEnvironment */ ({
-        name: generator.chance.sentence({ words: 2 }),
-        created: generator.chance.hammertime(),
-        _id: generator.chance.guid(),
-        _rev: generator.chance.guid(),
+        name: generator.lorem.sentence({ words: 2 }),
+        created: generator.types.datetime().getTime(),
+        _id: generator.types.uuid(),
+        _rev: generator.types.uuid(),
       });
     });
   }
@@ -51,19 +51,17 @@ describe('VariablesConsumerMixin', () => {
     let createdRandom = /** @type ARCVariable[] */ (null);
     before(async () => {
       await resetSelection();
-      createdDefault = await generator.insertVariablesAndEnvironments({
+      createdDefault = await generator.store.insertVariablesAndEnvironments(5, {
         defaultEnv: true,
-        size: 5,
       });
-      createdRandom = await generator.insertVariablesAndEnvironments({
+      createdRandom = await generator.store.insertVariablesAndEnvironments(5, {
         randomEnv: true,
-        size: 5,
       });
     });
 
     after(async () => {
       await resetSelection();
-      await generator.destroyVariablesData();
+      await generator.store.destroyVariables();
     });
     
     beforeEach(async () => {
@@ -77,7 +75,7 @@ describe('VariablesConsumerMixin', () => {
     });
 
     it('reads data for a created environment', async () => {
-      const envs = await generator.getDatastoreEnvironmentsData();
+      const envs = await generator.store.getDatastoreEnvironmentsData();
       const [env] = envs;
       const model = document.querySelector('variables-model');
       model.currentEnvironment = env._id;
@@ -91,14 +89,13 @@ describe('VariablesConsumerMixin', () => {
   describe('refreshEnvironments()', () => {
     let element = /** @type VariablesConsumer */ (null);
     before(async () => {
-      await generator.insertVariablesAndEnvironments({
+      await generator.store.insertVariablesAndEnvironments(5, {
         randomEnv: true,
-        size: 5,
       });
     });
 
     after(async () => {
-      await generator.destroyVariablesData();
+      await generator.store.destroyVariables();
     });
     
     beforeEach(async () => {
@@ -119,16 +116,15 @@ describe('VariablesConsumerMixin', () => {
     let element = /** @type VariablesConsumer */ (null);
     let envs = /** @type ARCEnvironment[] */ (null);
     before(async () => {
-      await generator.insertVariablesAndEnvironments({
+      await generator.store.insertVariablesAndEnvironments(5, {
         randomEnv: true,
-        size: 5,
       });
-      envs = await generator.getDatastoreEnvironmentsData();
+      envs = await generator.store.getDatastoreEnvironmentsData();
       assert.isAbove(envs.length, 0);
     });
 
     after(async () => {
-      await generator.destroyVariablesData();
+      await generator.store.destroyVariables();
       await resetSelection();
     });
     
@@ -163,7 +159,7 @@ describe('VariablesConsumerMixin', () => {
 
   describe('addEnvironment()', () => {
     after(async () => {
-      await generator.destroyVariablesData();
+      await generator.store.destroyVariables();
       ArcModelEvents.Environment.select(document.body, null);
     });
     
@@ -174,7 +170,7 @@ describe('VariablesConsumerMixin', () => {
 
     it('adds an environment to the data store', async () => {
       await element.addEnvironment('env1');
-      const envs = await generator.getDatastoreEnvironmentsData();
+      const envs = await generator.store.getDatastoreEnvironmentsData();
       assert.lengthOf(envs, 1);
       assert.equal(envs[0].name, 'env1');
     });
@@ -200,15 +196,14 @@ describe('VariablesConsumerMixin', () => {
     let element = /** @type VariablesConsumer */ (null);
     let envs = /** @type ARCEnvironment[] */ (null);
     before(async () => {
-      await generator.insertVariablesAndEnvironments({
+      await generator.store.insertVariablesAndEnvironments(5, {
         randomEnv: true,
-        size: 5,
       });
-      envs = await generator.getDatastoreEnvironmentsData();
+      envs = await generator.store.getDatastoreEnvironmentsData();
     });
 
     after(async () => {
-      await generator.destroyVariablesData();
+      await generator.store.destroyVariables();
     });
     
     beforeEach(async () => {
@@ -454,7 +449,7 @@ describe('VariablesConsumerMixin', () => {
 
       it('updates the variables', () => {
         const env = generateEnvironments(1)[0];
-        const variables = generator.generateVariablesData({ size: 5 });
+        const variables = generator.variables.listVariables(5);
         ArcModelEvents.Environment.State.select(document.body, {
           environment: env,
           variables,
@@ -477,14 +472,14 @@ describe('VariablesConsumerMixin', () => {
       });
 
       it('removes the variables from the list', () => {
-        element.variables = generator.generateVariablesData({ size: 10 });
+        element.variables = generator.variables.listVariables(10);
         const variable = element.variables[0];
         ArcModelEvents.Variable.State.delete(document.body, variable._id, 'test');
         assert.lengthOf(element.variables, 9, 'has 9 variables (-1)');
       });
 
       it('ignores unknown variables', () => {
-        element.variables = generator.generateVariablesData({ size: 10 });
+        element.variables = generator.variables.listVariables(10);
         ArcModelEvents.Variable.State.delete(document.body, '1', '2');
         assert.lengthOf(element.variables, 10, 'has 10 variables (-0)');
       });
@@ -497,7 +492,7 @@ describe('VariablesConsumerMixin', () => {
       });
 
       it('updates an existing variable', () => {
-        element.variables = generator.generateVariablesData({ size: 5, defaultEnv: true });
+        element.variables = generator.variables.listVariables(5, { defaultEnv: true });
         const variable = { ...element.variables[0] };
         variable.name = 'updated';
         const record = {
@@ -511,8 +506,8 @@ describe('VariablesConsumerMixin', () => {
       });
 
       it('adds created variable', () => {
-        element.variables = generator.generateVariablesData({ size: 5, defaultEnv: true });
-        const variable = generator.generateVariablesData({ size: 1, defaultEnv: true })[0];
+        element.variables = generator.variables.listVariables(5, { defaultEnv: true });
+        const variable = generator.variables.variable({ defaultEnv: true });
         const record = {
           item: variable,
           // @ts-ignore
@@ -525,8 +520,8 @@ describe('VariablesConsumerMixin', () => {
       });
 
       it('ignores other environment variables', () => {
-        element.variables = generator.generateVariablesData({ size: 5, defaultEnv: true });
-        const variable = generator.generateVariablesData({ size: 1, randomEnv: true })[0];
+        element.variables = generator.variables.listVariables(5, { defaultEnv: true });
+        const variable = generator.variables.variable({ randomEnv: true });
         const record = {
           item: variable,
           // @ts-ignore
