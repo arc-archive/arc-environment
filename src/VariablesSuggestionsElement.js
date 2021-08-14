@@ -220,7 +220,9 @@ export default class VariablesSuggestionsElement extends VariablesConsumerMixin(
     const variable = `{${name}}`
     const updated = `${pre}${variable}${suf}`;
     input.value = updated;
-    input.dispatchEvent(new Event('input'));
+    // regular input event bubbles. In anypoint input this is required as this
+    // `input` is a reference to the inner input element.
+    input.dispatchEvent(new Event('input', { bubbles: true, }));
     input.dispatchEvent(new Event('change'));
   }
 
