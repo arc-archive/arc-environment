@@ -51,6 +51,12 @@ describe('VariablesRunner', () => {
       enabled: true,
       environment: '',
     },
+    {
+      name: 'b46',
+      value: 'other',
+      enabled: true,
+      environment: '',
+    },
   ];
 
   describe('Variables processing', () => {
@@ -80,6 +86,8 @@ describe('VariablesRunner', () => {
       ['{encodeURIComponent(te s+t)}', 'te%20s%2Bt'],
       ['${decodeURIComponent(te%20s%2Bt)}', 'te s+t'],
       ['{decodeURIComponent(te%20s%2Bt)}', 'te s+t'],
+      ['{btoa(test)}', 'dGVzdA=='],
+      ['{atob(dGVzdA==)}', 'test'],
       [
         '{\n\t"v1":"${test1}",\n\t"v2": "${test2}"\n}',
         '{\n\t"v1":"value1",\n\t"v2": "value2 value1"\n}',

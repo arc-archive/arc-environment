@@ -37,4 +37,30 @@ describe('EvalFunctions', () => {
       assert.equal(result, '+');
     });
   });
+
+  describe('Btoa()', () => {
+    it('throws when no argument', () => {
+      assert.throws(() => {
+        EvalFunctions.Btoa(undefined);
+      });
+    });
+
+    it('encodes the first argument', () => {
+      const result = EvalFunctions.Btoa(['test', 'other']);
+      assert.equal(result, 'dGVzdA==');
+    });
+  });
+
+  describe('Atob()', () => {
+    it('throws when no argument', () => {
+      assert.throws(() => {
+        EvalFunctions.Atob(undefined);
+      });
+    });
+
+    it('decodes the first argument', () => {
+      const result = EvalFunctions.Atob(['dGVzdA==', 'other']);
+      assert.equal(result, 'test');
+    });
+  });
 });
