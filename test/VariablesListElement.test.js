@@ -9,6 +9,7 @@ import { variableValueLabel } from '../src/Utils.js';
 
 /* global PouchDB */
 
+/** @typedef {import('@anypoint-web-components/anypoint-input').AnypointInput} AnypointInput */
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCVariable} ARCVariable */
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCEnvironment} ARCEnvironment */
 /** @typedef {import('../index').VariablesListElement} VariablesListElement */
@@ -219,13 +220,22 @@ describe('VariablesListElement', () => {
       element[editedVariable] = id;
       element.requestUpdate();
       await nextFrame();
-      const input = /** @type HTMLInputElement */ (element.shadowRoot.querySelector('.variable-name'));
+      const input = /** @type AnypointInput */ (element.shadowRoot.querySelector('.variable-name'));
       input.value = 'updated-name';
       input.dispatchEvent(new CustomEvent('change'));
       const e = await oneEvent(window, ArcModelEventTypes.Variable.State.update);
       // @ts-ignore
       const { changeRecord } = e;
       assert.equal(changeRecord.id, id);
+    });
+
+    it('variable name has a pattern set', async () => {
+      const id = variables[0]._id;
+      element[editedVariable] = id;
+      element.requestUpdate();
+      await nextFrame();
+      const input = /** @type AnypointInput */ (element.shadowRoot.querySelector('.variable-name'));
+      assert.equal(input.allowedPattern, '[a-zA-Z0-9_]');
     });
 
     it('changes variable value', async () => {
