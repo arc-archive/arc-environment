@@ -104,6 +104,10 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
     this[editedVariable] = record.id;
     await this.requestUpdate();
     this.notifyResize();
+    const editor = this.shadowRoot.querySelector('.var-editor');
+    if (editor) {
+      editor.scrollIntoView();
+    }
   }
 
   /**
