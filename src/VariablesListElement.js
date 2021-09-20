@@ -306,7 +306,7 @@ export class VariablesListElement extends ArcResizableMixin(LitElement) {
         noLabelFloat
         autoValidate
         required
-        allowedPattern="[a-zA-Z0-9_-]"
+        allowedPattern="[a-zA-Z0-9_]"
         preventInvalidInput
         invalidMessage="Variable name is not valid"
         ?compatibility="${compatibility}"
