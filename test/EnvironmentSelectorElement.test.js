@@ -7,12 +7,17 @@ import { envSelectorOpened, } from '../src/EnvironmentSelectorElement.js';
 import '../environment-selector.js';
 // import { variableValueLabel } from '../src/Utils.js';
 
+/* global PouchDB */
+
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCVariable} ARCVariable */
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCEnvironment} ARCEnvironment */
 /** @typedef {import('../index').EnvironmentSelectorElement} EnvironmentSelectorElement */
 
 describe('EnvironmentSelectorElement', () => {
-  const generator = new ArcMock();
+  const generator = new ArcMock({
+    // @ts-ignore
+    store: PouchDB,
+  });
 
   /**
    * @param {ARCEnvironment=} environment

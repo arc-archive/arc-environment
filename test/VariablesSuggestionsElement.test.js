@@ -4,12 +4,17 @@ import { ArcMock } from '@advanced-rest-client/arc-data-generator';
 import sinon from 'sinon';
 import '../variables-suggestions.js';
 
+/* global PouchDB */
+
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCVariable} ARCVariable */
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCEnvironment} ARCEnvironment */
 /** @typedef {import('../index').VariablesSuggestionsElement} VariablesSuggestionsElement */
 
 describe('VariablesSuggestionsElement', () => {
-  const generator = new ArcMock();
+  const generator = new ArcMock({
+    // @ts-ignore
+    store: PouchDB,
+  });
 
   /**
    * @returns {Promise<VariablesSuggestionsElement>}

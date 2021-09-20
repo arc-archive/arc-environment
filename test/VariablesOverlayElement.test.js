@@ -4,12 +4,17 @@ import { ArcMock } from '@advanced-rest-client/arc-data-generator';
 import '../variables-overlay.js';
 import { resetSelection } from './ModelUtils.js';
 
+/* global PouchDB */
+
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCVariable} ARCVariable */
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCEnvironment} ARCEnvironment */
 /** @typedef {import('../index').VariablesOverlayElement} VariablesOverlayElement */
 
 describe('VariablesOverlayElement', () => {
-  const generator = new ArcMock();
+  const generator = new ArcMock({
+    // @ts-ignore
+    store: PouchDB,
+  });
 
   /**
    * @returns {Promise<VariablesOverlayElement>}

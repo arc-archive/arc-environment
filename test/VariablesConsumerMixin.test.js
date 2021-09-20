@@ -9,6 +9,8 @@ import { VariablesConsumerMixin } from '../index.js';
 import { systemVariablesModel, systemVariablesValue } from '../src/VariablesConsumerMixin.js';
 import { resetSelection } from './ModelUtils.js';
 
+/* global PouchDB */
+
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCVariable} ARCVariable */
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCEnvironment} ARCEnvironment */
 
@@ -20,7 +22,10 @@ const tag = defineCE(
 /** @typedef {VariablesConsumerMixin & LitElement} VariablesConsumer */
 
 describe('VariablesConsumerMixin', () => {
-  const generator = new ArcMock();
+  const generator = new ArcMock({
+    // @ts-ignore
+    store: PouchDB,
+  });
 
   /**
    * @returns {Promise<VariablesConsumer>}

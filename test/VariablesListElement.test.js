@@ -7,12 +7,17 @@ import { ArcModelEventTypes } from '@advanced-rest-client/arc-events';
 import { varAddHandler, editedVariable, } from '../src/VariablesListElement.js';
 import { variableValueLabel } from '../src/Utils.js';
 
+/* global PouchDB */
+
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCVariable} ARCVariable */
 /** @typedef {import('@advanced-rest-client/arc-types').Variable.ARCEnvironment} ARCEnvironment */
 /** @typedef {import('../index').VariablesListElement} VariablesListElement */
 
 describe('VariablesListElement', () => {
-  const generator = new ArcMock();
+  const generator = new ArcMock({
+    // @ts-ignore
+    store: PouchDB,
+  });
 
   /**
    * @param {array=} vars
