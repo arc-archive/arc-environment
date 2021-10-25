@@ -15,6 +15,9 @@ export declare const variablesListTemplate: unique symbol
 export declare const variablesItemTemplate: unique symbol
 export declare const listActionsTemplate: unique symbol
 
+/**
+ * @deprecated Use `@advanced-rest-client/app` instead.
+ */
 export class VariablesListElement extends ArcResizableMixin(LitElement) {
   static get styles(): CSSResult[];
 

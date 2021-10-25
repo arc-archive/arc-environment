@@ -14,6 +14,7 @@ export declare const systemVarsToggleHandler: unique symbol;
 /**
  * `Renders an overlay with variables information.
  * @fires ready Dispatched when refreshed the list of environments and the current environment
+ * @deprecated Use `@advanced-rest-client/app` instead.
  */
 export class VariablesOverlayElement extends VariablesConsumerMixin(ArcOverlayMixin(LitElement)) {
   static get styles(): CSSResult;

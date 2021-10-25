@@ -20,6 +20,7 @@ export const restoreInputMeta: unique symbol;
  * and allows to select a variable to be inserted into a text field.
  * 
  * @fires select Custom event dispatched when `preferEvent` is set. The detail is the variable name.
+ * @deprecated Use `@advanced-rest-client/app` instead.
  */
 export default class VariablesSuggestionsElement extends VariablesConsumerMixin(ArcOverlayMixin(LitElement)) {
   static get styles(): CSSResult[];

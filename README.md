@@ -1,4 +1,8 @@
-# arc-environment
+# Deprecated
+
+This component is deprecated. Use `@advanced-rest-client/app` instead.
+
+----
 
 The UI and logic related to environment and variables management in Advanced REST Client.
 

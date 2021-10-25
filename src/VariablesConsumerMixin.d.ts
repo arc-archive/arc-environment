@@ -22,6 +22,9 @@ export interface VariablesConsumerMixinConstructor {
   new(...args: any[]): VariablesConsumerMixin;
 }
 
+/**
+ * @deprecated Use `@advanced-rest-client/app` instead.
+ */
 export interface VariablesConsumerMixin {
   /**
    * The label to be used as the environment name.

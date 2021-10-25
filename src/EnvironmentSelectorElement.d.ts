@@ -16,6 +16,9 @@ export declare const envAddClickHandler: unique symbol
 export declare const envAddCancelHandler: unique symbol
 export declare const listOptionsTemplate: unique symbol
 
+/**
+ * @deprecated Use `@advanced-rest-client/app` instead.
+ */
 export declare class EnvironmentSelectorElement extends VariablesConsumerMixin(LitElement) {
   static get styles(): CSSResult[];
 
